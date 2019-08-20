@@ -1,0 +1,52 @@
+rm(list=ls())
+
+library(ggplot2)
+library(tidyr)
+library(ROCR)
+
+load("results/concomitant.combined.results2.rdata")
+load('results/concomitant.gru.replicates.rdata')
+
+
+fprs = seq(from=0.05,to=0.95,by=0.05)
+
+tprs.gru = array(NA, dim=c(25,length(fprs)))
+
+for (i in 1:25) {
+    current.roc = performance(preds[[i]],"tpr","fpr")
+    tprs.gru[i,] = sapply(fprs, function(x) current.roc@y.values[[1]][min(which(current.roc@x.values[[1]]>=x))])
+}
+
+tprs.glm = array(NA, dim=c(13,length(fprs)))
+tprs.xgb = array(NA, dim=c(13,length(fprs)))
+tprs.cox = array(NA, dim=c(13,length(fprs)))
+
+for (i in 1:13) {
+    current.roc = performance(preds.glm[[i]],"tpr","fpr")
+    tprs.glm[i,] = sapply(fprs, function(x) current.roc@y.values[[1]][min(which(current.roc@x.values[[1]]>=x))])
+    
+    current.roc = performance(preds.xgb[[i]],"tpr","fpr")
+    tprs.xgb[i,] = sapply(fprs, function(x) current.roc@y.values[[1]][min(which(current.roc@x.values[[1]]>=x))])
+    
+    current.roc = performance(preds.cox[[i]],"tpr","fpr")
+    tprs.cox[i,] = sapply(fprs, function(x) current.roc@y.values[[1]][min(which(current.roc@x.values[[1]]>=x))])
+}
+
+data = data.frame(fpr=c(0,fprs,1),gru=c(0,colMeans(tprs.gru),1),glm=c(0,colMeans(tprs.glm),1),xgb=c(0,colMeans(tprs.xgb),1),cox=c(0,colMeans(tprs.cox),1))
+
+data.expanded = gather(data,key="model",value="tpr",-fpr)
+
+png("figures/figure_4.png",width=800,height=600)
+ggplot(data.expanded,aes(x=fpr,y=tpr,color=factor(model,levels=c("gru","glm","xgb","cox"))))+geom_line(size=1)+
+    scale_color_manual(breaks=c("gru","glm","xgb","cox"),
+                       labels=c("RNN","GLM","XGBoost","Cox"),
+                       values=c("green","black","red","blue"))+
+    labs(color="Model")+xlab("False Positive Rate")+ylab("True Positive Rate")+
+    theme(legend.justification = c(1,0),
+          legend.position = c(1,0),
+          legend.box.margin = margin(c(10, 10, 10, 10)),
+          axis.text=element_text(size=20),
+          axis.title=element_text(size=24),
+          legend.title = element_text(size=24),
+          legend.text = element_text(size=20))
+dev.off()
