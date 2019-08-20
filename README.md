@@ -65,6 +65,7 @@ Scripts for generating figures
 3. generate_figure_3.R
 4. generate_figure_4.R
 5. generate_figure_5.R
+6. generate_figure_6.R
 
 ### Validation in an external dataset (eICU)
 Trains on MIMIC-3, tests on eICU
