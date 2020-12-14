@@ -11,7 +11,7 @@ source("functions/sum_in_past.R")
 source("functions/eval_sum_in_past.R")
 
 
-clinical.data = readRDS("clinical.data.mimic2.rds")
+clinical.data = readRDS("clinical.data.mimic.rds")
 weight.data = readRDS("weight.data.rds")
 sofa.scores = vector(mode="list",length=length(clinical.data))
 
