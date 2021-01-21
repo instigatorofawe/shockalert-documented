@@ -1,8 +1,14 @@
-rm(list=ls())
+---
+title: "R Notebook"
+output: html_notebook
+---
 
+Figure 3:
+```{r, echo=FALSE, results='hide'}
 library(ggplot2)
+library(knitr)
 
-model = readRDS("analysis.glm.rds")
+model = readRDS("results/analysis.glm.rds")
 
 coefficients = summary(model)$coefficients
 ordering = order(abs(coefficients[-1,1]),decreasing = T)+1
@@ -29,3 +35,7 @@ ggplot(data,aes(x=x,y=y))+geom_point(size=2)+geom_errorbar(aes(ymin=lower,ymax=u
           axis.text.y=element_text(size=24),
           axis.title=element_text(size=24))
 dev.off()
+
+include_graphics("figures/fig3.png")
+```
+

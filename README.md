@@ -60,14 +60,14 @@ Checkpoint files produced by Keras will be stored in the *checkpoints* folder, a
 
 ### Figures
 
-Scripts for generating figures located in: *src/R/notebooks*
+RMarkdown notebooks for generating and displaying figures are located in: *src/R/notebooks*
 
-1. generate_figure_1.R
-2. generate_figure_2.R
-3. generate_figure_3.R
-4. generate_figure_4.R
-5. generate_figure_5.R
-6. generate_figure_6.R
+1. figure_1.Rmd
+2. figure_2.Rmd
+3. figure_3.Rmd
+4. figure_4.Rmd
+5. figure_5.Rmd
+6. figure_6.Rmd
 
 ### Validation in an external dataset (eICU)
 

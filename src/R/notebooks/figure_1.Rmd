@@ -1,3 +1,10 @@
+---
+title: "R Notebook"
+output: html_notebook
+---
+
+```{r. echo=FALSE, results='hide'}
+
 rm(list=ls())
 
 library(xgboost)
@@ -8,10 +15,10 @@ library(ROCR)
 library(parallel)
 library(lubridate)
 library(ggplot2)
+library(knitr)
 
 load("results/concomitant.combined.results2.rdata")
 load("data/mimic/test.tables.concomitant.rdata")
-
 load("data/mimic/mimic3.reference.data2.rdata")
 
 a0 = do.call(rbind,nonsepsis.data)
@@ -50,17 +57,20 @@ shock.labels = mapply(function(x,y) {
 
 has.shock = sapply(shock.labels, function(x) any(x,na.rm=T))
 
-source("functions/eval_carry_forward.R")
-source("functions/eval_interval.R")
-source("functions/eval_max_in_past_2.R")
-source("functions/eval_sum_in_past.R")
-source("functions/eval_table_with_sofa_2.R")
-source("functions/generate_table_with_sofa_timestamps_2.R")
-source("functions/eval_early_prediction_premade_rf.R")
-source("functions/eval_early_prediction_premade_glm.R")
-source("functions/eval_early_prediction_timestamps_glm.R")
-source("functions/eval_table_with_sofa_timestamps_history.R")
+source("src/R/functions/mimic/eval_carry_forward.R")
+source("src/R/functions/mimic/eval_interval.R")
+source("src/R/functions/mimic/eval_max_in_past_2.R")
+source("src/R/functions/mimic/eval_sum_in_past.R")
+source("src/R/functions/mimic/eval_table_with_sofa_2.R")
+source("src/R/functions/mimic/generate_table_with_sofa_timestamps_2.R")
+source("src/R/functions/mimic/eval_early_prediction_premade_rf.R")
+source("src/R/functions/mimic/eval_early_prediction_premade_glm.R")
+source("src/R/functions/mimic/eval_early_prediction_timestamps_glm.R")
+source("src/R/functions/mimic/eval_table_with_sofa_timestamps_history.R")
+```
 
+Figure 1A:
+```{r, echo=FALSE, results='hide'}
 
 ###
 model.index = 10
@@ -104,7 +114,13 @@ ggplot(data,aes(x=t,y=risk))+geom_line(size=1)+xlim(0,shock.time+10)+ylim(0,1.3)
     theme(axis.text=element_text(size=20),
           axis.title=element_text(size=24))
 dev.off()
+
+include_graphics("figures/1a.png")
 ####
+```
+
+Figure 1B:
+```{r, echo=FALSE, results='hide'}
 
 index = 8
 
@@ -134,3 +150,6 @@ ggplot(data,aes(x=t,y=risk))+geom_line(size=1)+ylim(0,1.3)+geom_hline(yintercept
     theme(axis.text=element_text(size=20),
           axis.title=element_text(size=24))
 dev.off()
+
+include_graphics("figures/1b.png")
+```

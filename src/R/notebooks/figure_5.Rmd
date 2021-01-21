@@ -1,4 +1,13 @@
+---
+title: "R Notebook"
+output: html_notebook
+---
+
+Figure 5:
+```{r}
 rm(list=ls())
+library(ggplot2)
+library(knitr)
 
 load("results/concomitant.combined.results2.rdata")
 
@@ -10,3 +19,7 @@ ggplot(data.frame(ewt=ewt.glm.all),aes(x=ewt))+geom_histogram()+xlim(0,50)+geom_
     theme(axis.text=element_text(size=20),
           axis.title=element_text(size=24))
 dev.off()
+
+include_graphics("figures/fig5.png")
+```
+

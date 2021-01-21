@@ -1,4 +1,14 @@
+---
+title: "R Notebook"
+output: html_notebook
+---
+
+Figure 6:
+```{r}
 rm(list=ls())
+library(ggplot2)
+library(knitr)
+
 load("results/concomitant.combined.results2.rdata")
 
 model.index = 3
@@ -38,7 +48,7 @@ ppvs.rnn = mapply(function(a,b){
 
 data = data.frame(percentile=rep(0:9*10,3),ppv=c(ppvs.glm,ppvs.xgb,ppvs.rnn),model=c(rep("glm",10),rep("xgb",10),rep("rnn",10)))
 
-png("figures/patient_ppv.png",width=800,height=600)
+png("figures/fig6.png",width=800,height=600)
 ggplot(data,aes(x=percentile,y=ppv,color=factor(model,levels=c("glm","xgb","rnn"))))+geom_line(size=1)+ylim(0,1)+
     scale_x_continuous(breaks=seq(from=0,to=90,by=10))+
     xlab("Percentile")+ylab("PPV")+
@@ -52,3 +62,7 @@ ggplot(data,aes(x=percentile,y=ppv,color=factor(model,levels=c("glm","xgb","rnn"
           legend.position=c(1,0),
           legend.box.margin=margin(c(10,10,10,10)))
 dev.off()
+
+include_graphics("figures/fig6.png")
+```
+
