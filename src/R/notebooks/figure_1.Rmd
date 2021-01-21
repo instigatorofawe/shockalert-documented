@@ -3,7 +3,7 @@ title: "R Notebook"
 output: html_notebook
 ---
 
-```{r. echo=FALSE, results='hide'}
+```{r, echo=FALSE, results='hide'}
 
 rm(list=ls())
 

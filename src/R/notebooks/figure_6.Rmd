@@ -4,7 +4,7 @@ output: html_notebook
 ---
 
 Figure 6:
-```{r}
+```{r, echo=FALSE, results='hide'}
 rm(list=ls())
 library(ggplot2)
 library(knitr)
