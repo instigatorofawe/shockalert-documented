@@ -16,8 +16,8 @@ tic("Patient data query")
 patient.result = dbGetQuery(connection, query)
 toc()
 
-load("eicu/diagnosis_query.rdata")
-has.infection.icd9 = readRDS("eicu/has_infection_icd9.rds")
+load("data/eicu/diagnosis_query.rdata")
+has.infection.icd9 = readRDS("data/eicu/has_infection_icd9.rds")
 query.subjects = subjects[has.infection.icd9]
 
 
@@ -448,4 +448,4 @@ for (i in 1:length(clinical.data)) {
 
 toc()
 
-saveRDS(clinical.data,"eicu/clinical_data_icd9_sofa_vent.rds")
+saveRDS(clinical.data,"data/eicu/clinical_data_icd9_sofa_vent.rds")

@@ -1,43 +1,48 @@
 rm(list=ls())
-
+library(lubridate)
 library(pracma)
 library(tictoc)
 
-source("eicu_functions/eval_carry_forward.R")
-source("eicu_functions/eval_interval.R")
-source("eicu_functions/eval_max_in_past.R")
-source("eicu_functions/sum_in_past.R")
+source("src/R/functions/mimic/eval_carry_forward.R")
+source("src/R/functions/mimic/eval_interval.R")
+source("src/R/functions/mimic/eval_max_in_past.R")
+source("src/R/functions/mimic/sum_in_past.R")
+source("src/R/functions/mimic/eval_sum_in_past.R")
 
-clinical.data = readRDS("eicu/clinical_data_cleaned.rds")
-sofa.scores = vector(mode = "list", length = length(clinical.data))
+clinical.data = readRDS("data/mimic/clinical.data.mimic.rds")
+weight.data = readRDS("data/mimic/weight.data.rds")
+sofa.scores = vector(mode="list",length=length(clinical.data))
+
+#patient.weights = sapply(clinical.data, function(x) mean(weight.data[weight.data$icustay_id==x$icustay.id,]$valuenum,na.rm=T))
+
 
 tic("Evaluating SOFA scores")
+
 for (i in 1:length(clinical.data)) {
     fprintf("%d of %d...\n",i,length(clinical.data))
+    patient.weight = mean(weight.data[weight.data$icustay_id==clinical.data[[i]]$icustay.id,]$valuenum,na.rm=T)
+
     # Get unique timestamps
     timestamps = unlist(sapply(clinical.data[[i]][sapply(clinical.data[[i]],length)==2], function(x) x$timestamps))
     timestamps = sort(unique(timestamps[!is.null(timestamps)]))
-
+    
     if (length(timestamps)==0) {
         next
     }
+    
+    timestamps = as_datetime(timestamps,tz="GMT")
 
     # Compute sofa score at each timestamp
-
-    # Resp: PaO2/FiO2, ventilation
     resp.sofa = rep(0, length(timestamps))
 
+    # No good documentation of ventilation in MIMIC
     if (!is.null(clinical.data[[i]]$pao2)) {
         current.pao2 = rep(NA, length(timestamps))
         current.fio2 = rep(NA, length(timestamps))
-        current.vent = rep(FALSE, length(timestamps))
 
         current.pao2 = eval.carry.forward(timestamps,clinical.data[[i]]$pao2$timestamps,clinical.data[[i]]$pao2$values)
         if (!is.null(clinical.data[[i]]$fio2)) {
             current.fio2 = eval.carry.forward(timestamps,clinical.data[[i]]$fio2$timestamps,clinical.data[[i]]$fio2$values)
-        }
-        if (!is.null(clinical.data[[i]]$vent)) {
-            current.vent = eval.interval(timestamps,clinical.data[[i]]$vent$starts,clinical.data[[i]]$vent$stops)
         }
 
         current.fio2[is.na(current.fio2)] = 21
@@ -45,12 +50,12 @@ for (i in 1:length(clinical.data)) {
 
         resp.sofa[pao2.fio2.ratio<400] = 1
         resp.sofa[pao2.fio2.ratio<300] = 2
-        resp.sofa[pao2.fio2.ratio<200&current.vent] = 3
-        resp.sofa[pao2.fio2.ratio<100&current.vent] = 4
+        resp.sofa[pao2.fio2.ratio<200] = 3
+        resp.sofa[pao2.fio2.ratio<100] = 4
 
         resp.sofa = eval.max.in.past(timestamps, resp.sofa, 24*60)
     }
-    
+
     # Nervous: GCS
     nervous.sofa = rep(0, length(timestamps))
 
@@ -64,14 +69,14 @@ for (i in 1:length(clinical.data)) {
         nervous.sofa = eval.max.in.past(timestamps, nervous.sofa, 24*60)
     }
 
-    # Cardio: map, vasopressors
+    # Cardio: mbp, vasopressors
     # Difficult to determine correct units of measure of vasopressors, so just use presence/absence
     cardio.sofa = rep(0, length(timestamps))
     vasopressors = rep(FALSE, length(timestamps))
 
-    if (!is.null(clinical.data[[i]]$map)) {
-        current.map = eval.carry.forward(timestamps,clinical.data[[i]]$map$timestamps,clinical.data[[i]]$map$values)
-        cardio.sofa[current.map < 70] = 1
+    if (!is.null(clinical.data[[i]]$mbp)) {
+        current.mbp = eval.carry.forward(timestamps,clinical.data[[i]]$mbp$timestamps,clinical.data[[i]]$mbp$values)
+        cardio.sofa[current.mbp < 70] = 1
     }
 
     if (!is.null(clinical.data[[i]]$dop)) {
@@ -100,7 +105,6 @@ for (i in 1:length(clinical.data)) {
     }
 
     cardio.sofa = eval.max.in.past(timestamps, cardio.sofa, 24*60)
-    # Dosages unclear, so evaluating as any non-zero dosage
 
     # Liver: bilirubin
     liver.sofa = rep(0, length(timestamps))
@@ -144,12 +148,28 @@ for (i in 1:length(clinical.data)) {
     if (!is.null(clinical.data[[i]]$lactate)) {
         current.lactate = eval.carry.forward(timestamps,clinical.data[[i]]$lactate$timestamps,clinical.data[[i]]$lactate$values)
         lactate.criterion = current.lactate > 2
-        # Determine fluid resuscitation
     }
 
-    sofa.scores[[i]] = data.frame(timestamps = timestamps, resp=resp.sofa, nervous=nervous.sofa, cardio=cardio.sofa, liver=liver.sofa, coag = coag.sofa, kidney=kidney.sofa, lactate=lactate.criterion, vasopressors=vasopressors)
+    fluid.resuscitation = rep(FALSE, length(timestamps))
 
+    # Determine fluid resuscitation
+    if (!is.null(clinical.data[[i]]$fluids)&length(clinical.data[[i]]$fluids$timestamps)>0) {
+        current.fluids = eval.sum.in.past(timestamps,clinical.data[[i]]$fluids$timestamps,clinical.data[[i]]$fluids$values,hours(1))
+        fluid.resuscitation[current.fluids/patient.weight>30] = TRUE
+    }
+
+    if (!is.null(clinical.data[[i]]$urine)) {
+        current.urine = eval.sum.in.past(timestamps,clinical.data[[i]]$urine$timestamps,clinical.data[[i]]$urine$values,hours(1))
+        fluid.resuscitation[current.urine/patient.weight>0.5] = TRUE
+    }
+
+    if (!is.null(clinical.data[[i]]$cvp)) {
+        current.cvp = eval.carry.forward(timestamps,clinical.data[[i]]$cvp$timestamps,clinical.data[[i]]$cvp$values)
+        fluid.resuscitation[current.cvp>8] = TRUE
+    }
+
+    sofa.scores[[i]] = data.frame(timestamps = timestamps, resp=resp.sofa, nervous=nervous.sofa, cardio=cardio.sofa, liver=liver.sofa, coag = coag.sofa, kidney=kidney.sofa, lactate=lactate.criterion, vasopressors=vasopressors, fluids=fluid.resuscitation)
 }
 toc()
 
-saveRDS(sofa.scores, file("eicu/sofa_scores.rds"))
+saveRDS(sofa.scores, file("data/mimic/sofa_scores.rds"))

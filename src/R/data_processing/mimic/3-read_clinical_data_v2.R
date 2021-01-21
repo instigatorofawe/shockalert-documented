@@ -1,11 +1,10 @@
 rm(list=ls())
-
 library(pracma)
 library(tictoc)
 library(lubridate)
 
-load("query.items.mimic3.rdata")
-load("input.data.rdata")
+load("data/mimic/query.items.mimic3.rdata")
+load("data/mimic/input.data.rdata")
 
 input.data.cv = input.data.cv[!is.na(input.data.cv$icustay_id),]
 input.data.cv$charttime = as_datetime(input.data.cv$charttime,tz="GMT")
@@ -13,11 +12,11 @@ input.data.cv$charttime = as_datetime(input.data.cv$charttime,tz="GMT")
 input.data.mv = input.data.mv[!is.na(input.data.mv$icustay_id),]
 input.data.mv$starttime = as_datetime(input.data.mv$starttime,tz="GMT")
 
-chart.data = readRDS("chart.data.rds")
+chart.data = readRDS("data/mimic/chart.data.rds")
 chart.data = chart.data[!is.na(chart.data$icustay_id),]
 chart.data$charttime = as_datetime(chart.data$charttime,tz="GMT")
 
-urine.data = readRDS("urine.data.rds")
+urine.data = readRDS("data/mimic/urine.data.rds")
 urine.data = urine.data[!is.na(urine.data$icustay_id),]
 urine.data$charttime = as_datetime(urine.data$charttime,tz="GMT")
 
@@ -337,4 +336,4 @@ for (i in 1:length(icu.stays)) {
 }
 toc()
 
-saveRDS(clinical.data,file="clinical.data.mimic.rds")
+saveRDS(clinical.data,file="data/mimic/clinical.data.mimic.rds")

@@ -1,5 +1,4 @@
 rm(list=ls())
-
 library(RPostgreSQL)
 library(pracma)
 library(tictoc)
@@ -33,6 +32,9 @@ culture.data.3 = dbGetQuery(connection, query)
 
 dbDisconnect(connection)
 toc()
+
+abx.data = readRDS("data/mimic/abx.data.rds")
+load("data/mimic/culture.data.rdata")
 
 icustays = readRDS("icustays.rds")
 

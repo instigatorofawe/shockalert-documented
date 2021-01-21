@@ -1,17 +1,15 @@
 rm(list=ls())
-
-
 library(lubridate)
 library(pracma)
 library(tictoc)
 
-source("functions/eval_carry_forward.R")
-source("functions/eval_interval.R")
-source("functions/eval_max_in_past.R")
-source("functions/eval_sum_in_past.R")
+source("src/R/functions/mimic/eval_carry_forward.R")
+source("src/R/functions/mimic/eval_interval.R")
+source("src/R/functions/mimic/eval_max_in_past.R")
+source("src/R/functions/mimic/eval_sum_in_past.R")
 
-clinical.data = readRDS("clinical.data.mimic.rds")
-weight.data = readRDS("weight.data.rds")
+clinical.data = readRDS("data/mimic/clinical.data.mimic.rds")
+weight.data = readRDS("data/mimic/weight.data.rds")
 
 sepsis2.timestamps = vector(mode="list",length=length(clinical.data))
 
@@ -115,4 +113,4 @@ sepsis2.labels = mapply(function(a,b,c) {
     return(result)
 },sirs,severe,shock)
 
-save(sepsis2.labels,sepsis2.timestamps,sirs,severe,shock,file="sirs.rdata")
+save(sepsis2.labels,sepsis2.timestamps,sirs,severe,shock,file="data/mimic/sirs.rdata")

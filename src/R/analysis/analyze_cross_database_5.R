@@ -7,7 +7,7 @@ library(tictoc)
 library(ROCR)
 library(parallel)
 
-load("mimic3.reference.data2.rdata")
+load("data/mimic/mimic3.reference.data2.rdata")
 
 # Generate training data
 
@@ -30,10 +30,10 @@ tic("mimic.model.glm")
 mimic.model.glm = cv.glmnet(mimic.x, mimic.y, family="binomial")
 toc()
 
-load("eicu.test.rdata")
+load("data/eicu/eicu.test.rdata")
 
-eicu.clinical.data = readRDS("eicu/clinical_data_icd9_sofa_vent.rds")
-eicu.sofa.scores = readRDS("eicu/sofa_scores.rds")
+eicu.clinical.data = readRDS("data/eicu/clinical_data_icd9_sofa_vent.rds")
+eicu.sofa.scores = readRDS("data/eicu/sofa_scores.rds")
 
 
 lengths = sapply(eicu.sofa.scores, function(x) length(x$timestamps))
@@ -46,17 +46,17 @@ eicu.has.shock = sapply(eicu.shock.labels, function(x) any(x,na.rm=T)) #& has.dx
 eicu.shock.onsets = mapply(function(x,y) min(x$timestamps[y],na.rm=T),eicu.sofa.scores[lengths>0][eicu.has.shock],eicu.shock.labels[eicu.has.shock])
 
 
-source("eicu_functions/generate_sampling_rate_table.R")
-source("eicu_functions/eval_carry_forward.R")
-source("eicu_functions/eval_interval.R")
-source("eicu_functions/eval_max_in_past_2.R")
-source("eicu_functions/eval_sum_in_past.R")
-source("eicu_functions/eval_early_prediction_timestamps_rf.R")
-source("eicu_functions/eval_early_prediction_timestamps_glm.R")
-source("eicu_functions/eval_table_with_sofa_2.R")
-source("eicu_functions/generate_table_with_sofa_timestamps.R")
-source("functions/eval_early_prediction_premade_glm.R")
-source("functions/eval_early_prediction_premade_rf.R")
+source("src/R/functions/eicu/generate_sampling_rate_table.R")
+source("src/R/functions/eicu/eval_carry_forward.R")
+source("src/R/functions/eicu/eval_interval.R")
+source("src/R/functions/eicu/eval_max_in_past_2.R")
+source("src/R/functions/eicu/eval_sum_in_past.R")
+source("src/R/functions/eicu/eval_early_prediction_timestamps_rf.R")
+source("src/R/functions/eicu/eval_early_prediction_timestamps_glm.R")
+source("src/R/functions/eicu/eval_table_with_sofa_2.R")
+source("src/R/functions/eicu/generate_table_with_sofa_timestamps.R")
+source("src/R/functions/mimic/eval_early_prediction_premade_glm.R")
+source("src/R/functions/mimic/eval_early_prediction_premade_rf.R")
 
 lengths = sapply(eicu.sofa.scores, function(x) length(x$timestamps))
 

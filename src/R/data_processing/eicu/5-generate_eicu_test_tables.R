@@ -10,20 +10,20 @@ library(ggplot2)
 library(xgboost)
 library(lubridate)
 
-eicu.clinical.data = readRDS("eicu/clinical_data_icd9_sofa_vent.rds")
-eicu.patient.result = readRDS("eicu/patient_data.rds")
-eicu.sofa.scores = readRDS("eicu/sofa_scores.rds")
+eicu.clinical.data = readRDS("data/eicu/clinical_data_icd9_sofa_vent.rds")
+eicu.patient.result = readRDS("data/eicu/patient_data.rds")
+eicu.sofa.scores = readRDS("data/eicu/sofa_scores.rds")
 
-source("eicu_functions/generate_sampling_rate_table.R")
-source("eicu_functions/eval_carry_forward.R")
-source("eicu_functions/eval_interval.R")
-source("eicu_functions/eval_max_in_past_2.R")
-source("eicu_functions/eval_sum_in_past.R")
-source("eicu_functions/eval_early_prediction_timestamps_combined_rf.R")
-source("eicu_functions/eval_table_with_sofa.R")
-source("eicu_functions/generate_table_with_sofa_timestamps.R")
+source("src/R/functions/eicu/generate_sampling_rate_table.R")
+source("src/R/functions/eicu/eval_carry_forward.R")
+source("src/R/functions/eicu/eval_interval.R")
+source("src/R/functions/eicu/eval_max_in_past_2.R")
+source("src/R/functions/eicu/eval_sum_in_past.R")
+source("src/R/functions/eicu/eval_early_prediction_timestamps_combined_rf.R")
+source("src/R/functions/eicu/eval_table_with_sofa.R")
+source("src/R/functions/eicu/generate_table_with_sofa_timestamps.R")
 
-load("eicu.reference.rdata")
+load("data/eicu/eicu.reference.rdata")
 
 lengths = sapply(eicu.sofa.scores, function(x) length(x$timestamps))
 eicu.sepsis.labels = sapply(eicu.sofa.scores[lengths>0], function(x) rowSums(x[2:7])>=2)
@@ -53,4 +53,4 @@ stopCluster(cluster)
 
 save(eicu.sepsis.labels,eicu.has.sepsis,eicu.shock.labels,eicu.has.shock,eicu.shock.onsets,
     eicu.nonsepsis.data,eicu.nonshock.data,eicu.preshock.data,
-    file="eicu.test.rdata")
+    file="data/eicu/eicu.test.rdata")

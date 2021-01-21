@@ -16,26 +16,26 @@ num.cores = 4
 
 fprintf("Started at: %s\n", Sys.time())
 
-source("functions/generate_sampling_rate_table.R")
-source("functions/eval_carry_forward.R")
-source("functions/eval_interval.R")
-source("functions/eval_max_in_past_2.R")
-source("functions/eval_sum_in_past.R")
-source("functions/eval_table_with_sofa_4.R")
-source("functions/generate_table_with_sofa_timestamps_2.R")
-source("functions/eval_early_prediction_premade_rf.R")
-source("functions/eval_early_prediction_premade_glm.R")
+source("src/R/functions/mimic/generate_sampling_rate_table.R")
+source("src/R/functions/mimic/eval_carry_forward.R")
+source("src/R/functions/mimic/eval_interval.R")
+source("src/R/functions/mimic/eval_max_in_past_2.R")
+source("src/R/functions/mimic/eval_sum_in_past.R")
+source("src/R/functions/mimic/eval_table_with_sofa_4.R")
+source("src/R/functions/mimic/generate_table_with_sofa_timestamps_2.R")
+source("src/R/functions/mimic/eval_early_prediction_premade_rf.R")
+source("src/R/functions/mimic/eval_early_prediction_premade_glm.R")
 
 # Compare infection criteria across GLM/Cox on MIMIC-3
-is.adult = readRDS("is.adult.rds")
-has.matched = readRDS("has.matched.rds")
-icd9.infection.icustays = readRDS("icd9.infection.icustays.rds")
-icd9.infection.subjects = readRDS("icd9.infection.subjects.rds")
-load("infection.antibiotics.cultures.rdata")
+is.adult = readRDS("data/mimic/is.adult.rds")
+has.matched = readRDS("data/mimic/has.matched.rds")
+icd9.infection.icustays = readRDS("data/mimic/icd9.infection.icustays.rds")
+icd9.infection.subjects = readRDS("data/mimic/icd9.infection.subjects.rds")
+load("data/mimic/infection.antibiotics.cultures.rdata")
 
-sofa.scores = readRDS("processed/sofa_scores.rds")
-clinical.data = readRDS("clinical.data.mimic.rds")
-icustays = readRDS("icustays.rds")
+sofa.scores = readRDS("data/mimic/sofa_scores.rds")
+clinical.data = readRDS("data/mimic/clinical.data.mimic.rds")
+icustays = readRDS("data/mimic/icustays.rds")
 
 clinical.icustay.ids = sapply(clinical.data, function(x) x$icustay.id)
 clinical.subject.ids = sapply(clinical.icustay.ids,function(x) icustays$subject_id[which(icustays$icustay_id==x)])
@@ -84,12 +84,12 @@ ewt.cox = rep(NA,iterations) # Median ewt
 
 means.all = vector(mode="list",length=iterations)
 
-load("concomitant.sample.rdata")
+load("data/mimic/concomitant.sample.rdata")
 #nonsepsis.sample = runif(n=sum(!has.sepsis))<0.7
 #nonshock.sample = runif(n=sum(has.sepsis&!has.shock))<0.7
 #preshock.sample = runif(n=sum(has.shock))<0.7
 
-load("test.tables.concomitant.rdata")
+load("data/mimic/test.tables.concomitant.rdata")
 
 nonsepsis.timestamps = lapply(sofa.scores[has.infection][!has.sepsis][!nonsepsis.sample], function(x) x$timestamps)
 nonshock.timestamps = lapply(sofa.scores[has.infection][has.sepsis&!has.shock][!nonshock.sample], function(x) x$timestamps)

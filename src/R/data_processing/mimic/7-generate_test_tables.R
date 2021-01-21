@@ -7,26 +7,26 @@ library(ROCR)
 library(lubridate)
 library(pracma)
 
-source("functions/generate_sampling_rate_table.R")
-source("functions/eval_carry_forward.R")
-source("functions/eval_interval.R")
-source("functions/eval_max_in_past_2.R")
-source("functions/eval_sum_in_past.R")
-source("functions/eval_early_prediction_timestamps_glm.R")
-source("functions/eval_table_with_sofa_2.R")
-source("functions/eval_table_with_sofa_timestamps_history.R")
+source("src/R/functions/mimic/generate_sampling_rate_table.R")
+source("src/R/functions/mimic/eval_carry_forward.R")
+source("src/R/functions/mimic/eval_interval.R")
+source("src/R/functions/mimic/eval_max_in_past_2.R")
+source("src/R/functions/mimic/eval_sum_in_past.R")
+source("src/R/functions/mimic/eval_early_prediction_timestamps_glm.R")
+source("src/R/functions/mimic/eval_table_with_sofa_2.R")
+source("src/R/functions/mimic/eval_table_with_sofa_timestamps_history.R")
 
 
 # Compare infection criteria across GLM/Cox on MIMIC-3
-is.adult = readRDS("is.adult.rds")
-has.matched = readRDS("has.matched.rds")
-icd9.infection.icustays = readRDS("icd9.infection.icustays.rds")
-icd9.infection.subjects = readRDS("icd9.infection.subjects.rds")
-load("infection.antibiotics.cultures.rdata")
+is.adult = readRDS("data/mimic/is.adult.rds")
+has.matched = readRDS("data/mimic/has.matched.rds")
+icd9.infection.icustays = readRDS("data/mimic/icd9.infection.icustays.rds")
+icd9.infection.subjects = readRDS("data/mimic/icd9.infection.subjects.rds")
+load("data/mimic/infection.antibiotics.cultures.rdata")
 
-sofa.scores = readRDS("processed/sofa_scores.rds")
-clinical.data = readRDS("clinical.data.mimic.rds")
-icustays = readRDS("icustays.rds")
+sofa.scores = readRDS("data/mimic/sofa_scores.rds")
+clinical.data = readRDS("data/mimic/clinical.data.mimic.rds")
+icustays = readRDS("data/mimic/icustays.rds")
 
 clinical.icustay.ids = sapply(clinical.data, function(x) x$icustay.id)
 clinical.subject.ids = sapply(clinical.icustay.ids,function(x) icustays$subject_id[which(icustays$icustay_id==x)])
@@ -59,7 +59,7 @@ preshock.data = parLapply(cluster, 1:sum(has.shock), function(x) eval.table.with
 toc()
 stopCluster(cluster)
 
-save(nonsepsis.data,nonshock.data,preshock.data,file="test.tables.concomitant.rdata")
+save(nonsepsis.data,nonshock.data,preshock.data,file="data/mimic/test.tables.concomitant.rdata")
 
 ###
 # LSTM - Concomitant
@@ -75,7 +75,7 @@ preshock.data = parLapply(cluster, 1:sum(has.shock), function(x) eval.table.with
 toc()
 stopCluster(cluster)
 
-save(nonsepsis.data,nonshock.data,preshock.data,file="test.tables.concomitant.lstm.rdata")
+save(nonsepsis.data,nonshock.data,preshock.data,file="data/mimic/test.tables.concomitant.lstm.rdata")
 
 ###
 # ICD9
@@ -100,7 +100,7 @@ preshock.data = parLapply(cluster, 1:sum(has.shock), function(x) eval.table.with
 toc()
 stopCluster(cluster)
 
-save(nonsepsis.data,nonshock.data,preshock.data,file="test.tables.icd9.rdata")
+save(nonsepsis.data,nonshock.data,preshock.data,file="data/mimic/test.tables.icd9.rdata")
 
 ###
 # LSTM - ICD9
@@ -116,4 +116,4 @@ preshock.data = parLapply(cluster, 1:sum(has.shock), function(x) eval.table.with
 toc()
 stopCluster(cluster)
 
-save(nonsepsis.data,nonshock.data,preshock.data,file="test.tables.icd9.lstm.rdata")
+save(nonsepsis.data,nonshock.data,preshock.data,file="data/mimic/test.tables.icd9.lstm.rdata")

@@ -10,9 +10,9 @@ library(lubridate)
 library(ggplot2)
 
 load("results/concomitant.combined.results2.rdata")
-load("test.tables.concomitant.rdata")
+load("data/mimic/test.tables.concomitant.rdata")
 
-load("mimic3.reference.data2.rdata")
+load("data/mimic/mimic3.reference.data2.rdata")
 
 a0 = do.call(rbind,nonsepsis.data)
 a1 = do.call(rbind,nonshock.data)
@@ -20,18 +20,18 @@ a2 = do.call(rbind,preshock.data)
 mimic.x = as.matrix(rbind(a0,a1,a2))
 mimic.y = c(rep(0,dim(a0)[1]+dim(a1)[1]),rep(1,dim(a2)[1]))
 
-sofa.scores = readRDS("processed/sofa_scores.rds")
-clinical.data = readRDS("clinical.data.mimic.rds")
-icustays = readRDS("icustays.rds")
+sofa.scores = readRDS("data/mimic/sofa_scores.rds")
+clinical.data = readRDS("data/mimic/clinical.data.mimic.rds")
+icustays = readRDS("data/mimic/icustays.rds")
 
 clinical.icustay.ids = sapply(clinical.data, function(x) x$icustay.id)
 clinical.subject.ids = sapply(clinical.icustay.ids,function(x) icustays$subject_id[which(icustays$icustay_id==x)])
 
-is.adult = readRDS("is.adult.rds")
-has.matched = readRDS("has.matched.rds")
-icd9.infection.icustays = readRDS("icd9.infection.icustays.rds")
-icd9.infection.subjects = readRDS("icd9.infection.subjects.rds")
-load("infection.antibiotics.cultures.rdata")
+is.adult = readRDS("data/mimic/is.adult.rds")
+has.matched = readRDS("data/mimic/has.matched.rds")
+icd9.infection.icustays = readRDS("data/mimic/icd9.infection.icustays.rds")
+icd9.infection.subjects = readRDS("data/mimic/icd9.infection.subjects.rds")
+load("data/mimic/infection.antibiotics.cultures.rdata")
 
 has.infection.icd9 = is.element(clinical.icustay.ids, icd9.infection.icustays)
 has.infection.abx = is.element(clinical.icustay.ids, infection.abx.icustays)

@@ -29,4 +29,4 @@ codes = parSapply(cl, subjects, function(x) unique(unlist(processed.icd9.codes[r
 toc()
 stopCluster(cl)
 
-save(subjects,codes,processed.icd9.codes,result,file="eicu/diagnosis_query.rdata")
+save(subjects,codes,processed.icd9.codes,result,file="data/eicu/diagnosis_query.rdata")

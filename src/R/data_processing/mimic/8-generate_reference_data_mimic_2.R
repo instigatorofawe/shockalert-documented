@@ -10,19 +10,19 @@ library(ggplot2)
 library(lubridate)
 library(xgboost)
 
-source("functions/generate_sampling_rate_table.R")
-source("functions/eval_carry_forward.R")
-source("functions/eval_interval.R")
-source("functions/eval_max_in_past_2.R")
-source("functions/eval_sum_in_past.R")
-source("functions/eval_early_prediction_timestamps_combined_rf.R")
-source("functions/eval_table_with_sofa_2.R")
-source("functions/generate_table_with_sofa_timestamps_2.R")
+source("src/R/functions/mimic/generate_sampling_rate_table.R")
+source("src/R/functions/mimic/eval_carry_forward.R")
+source("src/R/functions/mimic/eval_interval.R")
+source("src/R/functions/mimic/eval_max_in_past_2.R")
+source("src/R/functions/mimic/eval_sum_in_past.R")
+source("src/R/functions/mimic/eval_early_prediction_timestamps_combined_rf.R")
+source("src/R/functions/mimic/eval_table_with_sofa_2.R")
+source("src/R/functions/mimic/generate_table_with_sofa_timestamps_2.R")
 
-sofa.scores = readRDS("processed/sofa_scores.rds")
-clinical.data = readRDS("clinical.data.mimic.rds")
-infection.icustays = readRDS("icd9.infection.icustays.rds")
-icustays = readRDS("icustays.rds")
+sofa.scores = readRDS("data/mimic/sofa_scores.rds")
+clinical.data = readRDS("data/mimic/clinical.data.mimic.rds")
+infection.icustays = readRDS("data/mimic/icd9.infection.icustays.rds")
+icustays = readRDS("data/mimic/icustays.rds")
 
 # Convert timestamps to numeric
 clinical.subjects = sapply(clinical.data, function(x) x$icustay.id)
@@ -68,4 +68,4 @@ stopCluster(cluster)
 
 save(clinical.subjects,clinical.hadm.ids,has.infection,sepsis.labels,has.sepsis,shock.labels,has.shock,shock.onsets,sampling.rate.data,noninfection.data.sampling.rate,nonsepsis.data.sampling.rate,
     nonshock.data.sampling.rate,preshock.data.sampling.rate,noninfection.data,nonsepsis.data,nonshock.data,preshock.data,
-    file="mimic3.reference.data2.rdata")
+    file="data/mimic/mimic3.reference.data2.rdata")

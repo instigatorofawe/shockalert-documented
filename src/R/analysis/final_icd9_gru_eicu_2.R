@@ -11,26 +11,26 @@ library(tensorflow)
 library(keras)
 library(abind)
 
-source("functions/generate_sampling_rate_table.R")
-source("functions/eval_carry_forward.R")
-source("functions/eval_interval.R")
-source("functions/eval_max_in_past_2.R")
-source("functions/eval_sum_in_past.R")
-source("functions/eval_early_prediction_timestamps_glm.R")
-source("functions/eval_early_prediction_timestamps_history.R")
-source("functions/eval_table_with_sofa.R")
-source("functions/eval_table_with_sofa_timestamps_history.R")
-source("functions/generate_table_with_sofa_timestamps_history_2.R")
+source("src/R/functions/mimic/generate_sampling_rate_table.R")
+source("src/R/functions/mimic/eval_carry_forward.R")
+source("src/R/functions/mimic/eval_interval.R")
+source("src/R/functions/mimic/eval_max_in_past_2.R")
+source("src/R/functions/mimic/eval_sum_in_past.R")
+source("src/R/functions/mimic/eval_early_prediction_timestamps_glm.R")
+source("src/R/functions/mimic/eval_early_prediction_timestamps_history.R")
+source("src/R/functions/mimic/eval_table_with_sofa.R")
+source("src/R/functions/mimic/eval_table_with_sofa_timestamps_history.R")
+source("src/R/functions/mimic/generate_table_with_sofa_timestamps_history_2.R")
 
 # Compare infection criteria across GLM/Cox on MIMIC-3
-is.adult = readRDS("is.adult.rds")
-icd9.infection.icustays = readRDS("icd9.infection.icustays.rds")
-icd9.infection.subjects = readRDS("icd9.infection.subjects.rds")
-load("infection.antibiotics.cultures.rdata")
+is.adult = readRDS("data/mimic/is.adult.rds")
+icd9.infection.icustays = readRDS("data/mimic/icd9.infection.icustays.rds")
+icd9.infection.subjects = readRDS("data/mimic/icd9.infection.subjects.rds")
+load("data/mimic/infection.antibiotics.cultures.rdata")
 
-sofa.scores = readRDS("processed/sofa_scores.rds")
-clinical.data = readRDS("clinical.data.mimic.rds")
-icustays = readRDS("icustays.rds")
+sofa.scores = readRDS("data/mimic/processed/sofa_scores.rds")
+clinical.data = readRDS("data/mimic/clinical.data.mimic.rds")
+icustays = readRDS("data/mimic/icustays.rds")
 
 clinical.icustay.ids = sapply(clinical.data, function(x) x$icustay.id)
 clinical.subject.ids = sapply(clinical.icustay.ids,function(x) icustays$subject_id[which(icustays$icustay_id==x)])
@@ -50,7 +50,7 @@ shock.labels = mapply(function(x,y) x&y$lactate&y$vasopressors, sepsis.labels, s
 has.shock = sapply(shock.labels, function(x) any(x,na.rm=T))
 shock.onsets = as_datetime(mapply(function(x,y) min(x$timestamps[y],na.rm=T),sofa.scores[has.infection][has.shock],shock.labels[has.shock]),tz="GMT")
 
-load("icd9.lstm.reference.dataset.rdata")
+load("data/mimic/icd9.lstm.reference.dataset.rdata")
 
 nonsepsis.sample = runif(n=length(nonsepsis.data))<0.7
 nonshock.sample = runif(n=length(nonshock.data))<0.7
@@ -109,8 +109,8 @@ history <- model %>% fit(
 #model = load_model_hdf5("checkpoints/checkpoint.2.concomitant.subset.lstm.35-0.20.h5")
 
 # Load test tables
-load("eicu.lstm.test.rdata")
-source("functions/eval_early_prediction_premade_history_rf.R")
+load("data/mimic/eicu.lstm.test.rdata")
+source("src/R/functions/mimic/eval_early_prediction_premade_history_rf.R")
 
 tic("nonsepsis predictions")
 nonsepsis.predictions = sapply(nonsepsis.data, function(x) eval.early.prediction.premade.history.rf(x,means,model))
@@ -148,9 +148,9 @@ ppv = sum(shock.maxes>=threshold)/(sum(shock.maxes>=threshold)+sum(nonsepsis.max
 
 # Fix EWT calculation
 
-eicu.clinical.data = readRDS("eicu/clinical_data_icd9_sofa_vent.rds")
-eicu.patient.result = readRDS("eicu/patient_data.rds")
-eicu.sofa.scores = readRDS("eicu/sofa_scores.rds")
+eicu.clinical.data = readRDS("data/eicu/clinical_data_icd9_sofa_vent.rds")
+eicu.patient.result = readRDS("data/eicu/patient_data.rds")
+eicu.sofa.scores = readRDS("data/eicu/sofa_scores.rds")
 
 lengths = sapply(eicu.sofa.scores, function(x) length(x$timestamps))
 eicu.sepsis.labels = sapply(eicu.sofa.scores[lengths>0], function(x) rowSums(x[2:7])>=2)
