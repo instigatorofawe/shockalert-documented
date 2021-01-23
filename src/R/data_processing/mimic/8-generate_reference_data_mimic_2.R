@@ -16,7 +16,7 @@ source("src/R/functions/mimic/eval_interval.R")
 source("src/R/functions/mimic/eval_max_in_past_2.R")
 source("src/R/functions/mimic/eval_sum_in_past.R")
 source("src/R/functions/mimic/eval_early_prediction_timestamps_combined_rf.R")
-source("src/R/functions/mimic/eval_table_with_sofa_2.R")
+source("src/R/functions/mimic/eval_table_with_sofa_4.R")
 source("src/R/functions/mimic/generate_table_with_sofa_timestamps_2.R")
 
 sofa.scores = readRDS("data/mimic/sofa_scores.rds")

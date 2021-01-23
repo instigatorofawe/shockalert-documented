@@ -20,7 +20,7 @@ source("src/R/functions/eicu/eval_interval.R")
 source("src/R/functions/eicu/eval_max_in_past_2.R")
 source("src/R/functions/eicu/eval_sum_in_past.R")
 source("src/R/functions/eicu/eval_early_prediction_timestamps_combined_rf.R")
-source("src/R/functions/eicu/eval_table_with_sofa.R")
+source("src/R/functions/eicu/eval_table_with_sofa_3.R")
 source("src/R/functions/eicu/generate_table_with_sofa_timestamps.R")
 
 load("data/eicu/eicu.reference.rdata")

@@ -1,6 +1,6 @@
 rm(list=ls())
 
-library(RPostgreSQL)
+library(RPostgres)
 library(pracma)
 library(tictoc)
 
@@ -8,7 +8,7 @@ user = "postgres"
 password = "postgres"
 db = "eicu"
 
-connection = dbConnect(PostgreSQL(), user=user, password=password, dbname=db)
+connection = dbConnect(Postgres(), user=user, password=password, dbname=db)
 
 # Query all patient data in general
 query = "select * from patient"

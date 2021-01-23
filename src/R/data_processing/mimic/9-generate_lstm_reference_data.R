@@ -12,7 +12,7 @@ source("src/R/functions/eval_max_in_past_2.R")
 source("src/R/functions/eval_sum_in_past.R")
 source("src/R/functions/eval_early_prediction_timestamps_glm.R")
 source("src/R/functions/eval_early_prediction_timestamps_history.R")
-source("src/R/functions/eval_table_with_sofa.R")
+source("src/R/functions/eval_table_with_sofa_4.R")
 source("src/R/functions/eval_table_with_sofa_timestamps_history.R")
 source("src/R/functions/generate_table_with_sofa_timestamps_history_2.R")
 
