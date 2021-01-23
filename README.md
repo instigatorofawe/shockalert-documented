@@ -45,9 +45,10 @@ These scripts should be run in order (and have filenames which are numbered acco
 1. query_suspected_infection_eicu.R - queries eICU postres database for ICD-9 codes
 2. analyze_suspected_infection_icd9_eicu.R - determines which ICD-9 codes are indicative of suspected infection according to Angus et al.
 3. generate_clinical_tables_eicu.R - queries eICU postgres database and generates data tables
-4. validate_clinical_data_eicu.R - throws out patients with no data
-5. eval_sepsis3_eicu.R - evaluates Sepsis-3 criteria
-7. generate_eicu_test_tables.R - Generates testing data tables for cross-database validation
+4. eval_sepsis3_eicu.R - evaluates Sepsis-3 criteria
+5. generate_eicu_reference.R
+6. generate_eicu_test_tables- Generates testing data tables for cross-database validation
+7. generate_eicu_lstm_test_2.R
 
 ### Analysis
 

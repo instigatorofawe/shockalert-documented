@@ -1,6 +1,6 @@
 rm(list=ls())
 
-library(RPostgreSQL)
+library(RPostgres)
 library(pracma)
 library(tictoc)
 
@@ -11,7 +11,7 @@ db = "mimic"
 query = "SELECT * FROM diagnoses_icd"
 
 tic()
-connection = dbConnect(PostgreSQL(), user=user, password=password, dbname=db)
+connection = dbConnect(Postgres(), user=user, password=password, dbname=db)
 icd9.data = dbGetQuery(connection, query)
 dbDisconnect(connection)
 toc()

@@ -1,6 +1,6 @@
 rm(list=ls())
 
-library(RPostgreSQL)
+library(RPostgres)
 library(tictoc)
 library(parallel)
 
@@ -10,7 +10,7 @@ db = "eicu"
 
 # ICD-9 codes
 query = "select patientunitstayid, icd9code from diagnosis"
-connection = dbConnect(PostgreSQL(), user=user, password=password, dbname=db)
+connection = dbConnect(Postgres(), user=user, password=password, dbname=db)
 result = dbGetQuery(connection, query)
 dbDisconnect(connection)
 
